@@ -27,7 +27,9 @@ R = 2*eye(nu);
 N = 7;
 
 disturbance = 0*UTN.Nominal_inflow;
-r = 10*ones(nx,1) ; 
+ext_links = find(UTN.Links(:,1) > 6 | UTN.Links(:,2) > 6);
+r = 10*zeros(nx,1) ;
+r(ext_links) = 10;
 xsim = 300*ones(18,1); 
 
 Simlength = 50;

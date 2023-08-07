@@ -1,4 +1,8 @@
 function x = lower_dynamics_expanded(state,input, disturbance, k, UTN)
+%% TODO 
+%Incorporate that at the external links cars leave at speed equal to
+%saturation flow of that external link
+
      A = eye(length(UTN.Links)) - diag(UTN.Parking_rates - UTN.Merging_rates);
      if isa(input, 'sdpvar')
          Out = sdpvar(length(UTN.Links),1);
@@ -26,6 +30,11 @@ function x = lower_dynamics_expanded(state,input, disturbance, k, UTN)
             Out(m) = Out(m) + a_out;
         end
      end
+      
+     %Behavior on external links
+%      for m = find(UTN.Links(:,1) > 6 | UTN.Links(:,2) > 6)
+%          Out(m) = Out(m) + 1;
+%      end
      x = A*state + (In-Out)*UTN.Cycle(1) + disturbance;   
      end
      
