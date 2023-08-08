@@ -25,7 +25,9 @@ for i=1:length(s)
 end
 %data_struct.Traffic_lights = vertcat(data_Struct.Traffic_lights{:});
 % data_struct.Traffic_lights = reshape(data_struct.Traffic_lights, [length(data_struct.Traffic_lights),1]);
-
+data_struct.External_Links = find(data_struct.Links(:,1) > 6 | data_struct.Links(:,2) > 6);
+data_struct.Internal_Links = find(data_struct.Links(:,1) <= 6 & data_struct.Links(:,2) <= 6);
+data_struct.External_Output_Links = find(data_struct.Links(:,2) > 6);
 %% Flow Initialization
 data_struct.Saturation_flow = zeros(18,18);
 for i=1:length(data_struct.Links)

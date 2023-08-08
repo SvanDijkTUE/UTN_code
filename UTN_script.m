@@ -26,10 +26,11 @@ Q = eye(nx);
 R = 2*eye(nu);
 N = 7;
 
-disturbance = 0*UTN.Nominal_inflow;
+disturbance = 1*UTN.Nominal_inflow;
 ext_links = find(UTN.Links(:,1) > 6 | UTN.Links(:,2) > 6);
 r = 10*zeros(nx,1) ;
 r(ext_links) = 10;
+r = 10*ones(nx,1);
 xsim = 300*ones(18,1); 
 
 Simlength = 50;
@@ -51,7 +52,7 @@ x{1} = xsim;
  for k = 1:N
      x{k+1} = lower_dynamics_expanded(x{k},u{k}, disturbance, k, UTN);
      objective = objective + (x{k+1}(sel_links)-r(sel_links))'*(x{k+1}(sel_links)-r(sel_links)) + 0.0001*u{k}'*u{k};
-     constraints = [constraints, 0 <= u{k}<= 120, x{k+1}>=slack_var{k}, slack_var{k}>=0]; 
+     constraints = [constraints, 0 <= u{k}<= 120, x{k+1}>=slack_var{k}, slack_var{k}(sel_links)>=0]; 
      for i = UTN.Intersections
          idx = find(UTN.Traffic_lights(:,2) == i);
          constraints = [constraints, sum(u{k}(idx))<= UTN.Cycle(i)];
@@ -67,7 +68,7 @@ x{1} = xsim;
  
 end
 toc
-int_links = find(UTN.Links(:,1) <= 6 & UTN.Links(:,2) <= 6)
+int_links = find(UTN.Links(:,1) <= 6 & UTN.Links(:,2) <= 6);
 
 hold on
 plot(Xhist(1,:))

@@ -29,6 +29,12 @@ function x = lower_dynamics_expanded(state,input, disturbance, k, UTN)
             a_out = UTN.Turning_rates(u,d,UTN.Output_nodes{m}(i))*UTN.Saturation_flow(u,d)*input(idxt)/UTN.Cycle(m);
             Out(m) = Out(m) + a_out;
         end
+        
+        %assuming the exit Links empty out at a speed proportional to the
+        %number of cars in the street.
+        if ismember(m, UTN.External_Output_Links) == 1
+            Out(m) = Out(m) + min(UTN.Saturation_flow(u,d), state(m)/UTN.Cycle(m));
+        end
      end
       
      %Behavior on external links
