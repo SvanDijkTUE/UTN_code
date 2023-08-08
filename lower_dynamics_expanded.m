@@ -32,8 +32,10 @@ function x = lower_dynamics_expanded(state,input, disturbance, k, UTN)
         
         %assuming the exit Links empty out at a speed proportional to the
         %number of cars in the street.
-        if ismember(m, UTN.External_Output_Links) == 1
-            Out(m) = Out(m) + min(UTN.Saturation_flow(u,d), state(m)/UTN.Cycle(m));
+        if UTN.Options.Empty_output_links == true
+            if ismember(m, UTN.External_Output_Links) == 1
+                Out(m) = Out(m) + min(UTN.Saturation_flow(u,d), state(m)/UTN.Cycle(m));
+            end
         end
      end
       

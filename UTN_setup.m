@@ -121,3 +121,6 @@ data_struct.Link_free_flow = data_struct.Saturation_flow;
  
  %% Average Vehicle
  data_struct.Length_average_vehicle = 3.5;
+ 
+ %% Define simulation Option
+ data_struct.Options.Empty_output_links = false;

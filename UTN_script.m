@@ -4,6 +4,8 @@ clearvars -except Xhist2
 close all
 tic
 UTN = UTN_setup();
+
+UTN.Options.Empty_output_links = false;
 %% Check Function that all traffic lights have assigned turning rates
 % for i=1:length(UTN.Traffic_lights)
 %     if UTN.Turning_rates(UTN.Traffic_lights{i}(1),UTN.Traffic_lights{i}(2),UTN.Traffic_lights{i}(3)) == 0
