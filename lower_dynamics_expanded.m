@@ -18,6 +18,12 @@ function [x q] = lower_dynamics_expanded(state,input, disturbance, queue, k, UTN
      for m=1:length(UTN.Links)
         u = UTN.Links(m,1);
         d = UTN.Links(m,2);
+        
+        %Some queue calculations
+        gamma  = UTN.Link_capacity(m) - sum(queue(find(UTN.Traffic_lights(:,1) == u & UTN.Traffic_lights(:,2) == d)))*UTN.Length_average_vehicle/(UTN.Free_flow(m)*UTN.Link_nr_of_lanes(m)*UTN.Cycle(m));
+        tau = floor(gamma);
+        gamma  = gamma-tau;
+        
         In(m) = 0; Out(m) = 0;
      %% Determine a_enter at link m
         %find inbound indices

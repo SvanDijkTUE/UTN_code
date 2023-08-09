@@ -102,7 +102,7 @@ data_struct.Cycle = 120*ones(18,1);
 %% Link Capacities
  data_struct.Link_nr_of_lanes(1:length(data_struct.Links),1) = 1;
  data_struct.Link_capacity(1:length(data_struct.Links),1) = 2000; %Obtain accurate link capacity based on MFD
-data_struct.Link_free_flow = data_struct.Saturation_flow;
+ data_struct.Link_free_flow = data_struct.Saturation_flow;
 
 %% Input and Output Links
  for m=1:length(data_struct.Links)

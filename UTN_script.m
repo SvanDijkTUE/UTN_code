@@ -5,7 +5,7 @@ close all
 tic
 UTN = UTN_setup();
 
-UTN.Options.Empty_output_links = true;         %Controls if we flush the output links to the larger network
+UTN.Options.Empty_output_links = false;         %Controls if we flush the output links to the larger network
 %% Check Function that all traffic lights have assigned turning rates
 % for i=1:length(UTN.Traffic_lights)
 %     if UTN.Turning_rates(UTN.Traffic_lights{i}(1),UTN.Traffic_lights{i}(2),UTN.Traffic_lights{i}(3)) == 0
@@ -28,7 +28,7 @@ Q = 20; %eye(nx);
 R = 2*eye(nu);
 N = 7;
 
-disturbance = 0*UTN.Nominal_inflow;
+disturbance = 1*UTN.Nominal_inflow;
 ext_links = find(UTN.Links(:,1) > 6 | UTN.Links(:,2) > 6);
 r = 10*zeros(nx,1) ;
 r(ext_links) = 10;
@@ -51,14 +51,14 @@ objective = 0;
 % Include the min condition in the dynamics function
 % Include constraints so that traffic lights don't "crash"
 x{1} = xsim; 
-queue = zeros(nu,1);
+queue = 20*ones(nu,1);
  for k = 1:N
      if k == floor(N/2)
-         disturbance = 0*UTN.Nominal_inflow;
+         disturbance = 2*UTN.Nominal_inflow;
      end
-     [x{k+1} queue] = lower_dynamics_expanded(x{k},u{k}, disturbance, queue, k, UTN);
+     x{k+1} = lower_dynamics(x{k},u{k}, disturbance, k, UTN);
      objective = objective + (x{k+1}(sel_links)-r(sel_links))'*Q*(x{k+1}(sel_links)-r(sel_links)) + 0.0001*u{k}'*u{k};
-     constraints = [constraints, 5 <= u{k}<= 120 x{k+1}>=slack_var{k}, slack_var{k}(sel_links)>=0]; 
+     constraints = [constraints, 10 <= u{k}<= 120, x{k+1}(sel_links)>=slack_var{k}(sel_links), slack_var{k}(sel_links)>=-50]; 
      for i = UTN.Intersections
          idx = find(UTN.Traffic_lights(:,2) == i);
          constraints = [constraints, sum(u{k}(idx))<= UTN.Cycle(i)];
@@ -67,12 +67,11 @@ queue = zeros(nu,1);
  end
  ops = sdpsettings('solver','gurobi'); 
  diagnostics = optimize(constraints, objective, ops); 
- xsim = lower_dynamics_expanded(xsim,value(u{1}), disturbance, queue, 1, UTN);
+ xsim = lower_dynamics(xsim,value(u{1}), disturbance, 1, UTN);
  Xhist(:,t+1) = xsim; 
  Uhist(:,t) = value(u{1}); 
  
-  if strcmp(diagnostics.info, ...
-         'Either infeasible or unbounded (<a href="yalmip.github.io/infeasibleorunbounded">learn to debug</a>) (GUROBI-NONCONVEX)') == 1
+  if diagnostics.problem == 12
      fprintf('Simulation terminated after t = %d iterations\n', t)
      Xhist = Xhist(:,1:t+1);
      break;
